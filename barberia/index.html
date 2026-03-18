@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Chat Barbería</title>
+</head>
+<body>
+
+<h2>Reserva tu cita</h2>
+
+<div id="chat"></div>
+
+<input id="mensaje" placeholder="Escribe aquí...">
+<button onclick="enviar()">Enviar</button>
+
+<script>
+async function enviar() {
+  const mensaje = document.getElementById("mensaje").value;
+
+  const url = "https://nova-agency06.app.n8n.cloud/webhook/chat?message=" 
+    + encodeURIComponent(mensaje) 
+    + "&negocio=barberia_demo";
+
+  const res = await fetch(url);
+  const data = await res.text();
+
+  document.getElementById("chat").innerHTML += "<p><b>Tú:</b> " + mensaje + "</p>";
+  document.getElementById("chat").innerHTML += "<p><b>Bot:</b> " + data + "</p>";
+}
+</script>
+
+</body>
+</html>
