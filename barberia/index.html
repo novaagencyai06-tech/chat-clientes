@@ -3,71 +3,95 @@
 <head>
   <title>Chat de reservas</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <style>
     body {
+      margin: 0;
       font-family: Arial;
-      background: #f5f5f5;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
+      background: #e5ddd5;
     }
 
     #chat-container {
-      width: 100%;
-      max-width: 400px;
-      background: white;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
       display: flex;
       flex-direction: column;
-      height: 500px;
+      height: 100vh;
+      width: 100%;
+    }
+
+    #header {
+      background: #075e54;
+      color: white;
+      padding: 15px;
+      font-weight: bold;
+      text-align: center;
     }
 
     #chat {
       flex: 1;
       padding: 10px;
       overflow-y: auto;
+      display: flex;
+      flex-direction: column;
     }
 
     .user {
-      text-align: right;
+      align-self: flex-end;
+      background: #dcf8c6;
+      padding: 10px;
+      border-radius: 10px;
       margin: 5px;
+      max-width: 70%;
     }
 
     .bot {
-      text-align: left;
+      align-self: flex-start;
+      background: white;
+      padding: 10px;
+      border-radius: 10px;
       margin: 5px;
-    }
-
-    input {
-      border: none;
-      padding: 15px;
-      width: 70%;
-    }
-
-    button {
-      width: 30%;
-      background: black;
-      color: white;
-      border: none;
+      max-width: 70%;
     }
 
     #input-area {
       display: flex;
-      border-top: 1px solid #ddd;
+      background: #f0f0f0;
+      padding: 10px;
+    }
+
+    input {
+      flex: 1;
+      padding: 10px;
+      border-radius: 20px;
+      border: none;
+      outline: none;
+    }
+
+    button {
+      margin-left: 10px;
+      padding: 10px 15px;
+      border: none;
+      background: #075e54;
+      color: white;
+      border-radius: 20px;
     }
   </style>
 </head>
+
 <body>
 
 <div id="chat-container">
+
+  <div id="header">
+    Reservas online
+  </div>
+
   <div id="chat"></div>
 
   <div id="input-area">
-    <input id="mensaje" placeholder="Escribe aquí...">
+    <input id="mensaje" placeholder="Escribe tu mensaje...">
     <button onclick="enviar()">Enviar</button>
   </div>
+
 </div>
 
 <script>
@@ -79,11 +103,15 @@ async function enviar() {
 
   const chat = document.getElementById("chat");
 
-  // Mensaje usuario
-  chat.innerHTML += `<div class="user"><b>Tú:</b> ${mensaje}</div>`;
+  // mensaje usuario
+  const userMsg = document.createElement("div");
+  userMsg.className = "user";
+  userMsg.innerText = mensaje;
+  chat.appendChild(userMsg);
+
   mensajeInput.value = "";
 
-  // 👇 "Escribiendo..."
+  // escribiendo...
   const typing = document.createElement("div");
   typing.className = "bot";
   typing.innerText = "Escribiendo...";
@@ -98,11 +126,12 @@ async function enviar() {
   const res = await fetch(url);
   const data = await res.text();
 
-  // 👇 quitar "Escribiendo..."
   typing.remove();
 
-  // Respuesta del bot
-  chat.innerHTML += `<div class="bot"><b>Bot:</b> ${data}</div>`;
+  const botMsg = document.createElement("div");
+  botMsg.className = "bot";
+  botMsg.innerText = data;
+  chat.appendChild(botMsg);
 
   chat.scrollTop = chat.scrollHeight;
 }
