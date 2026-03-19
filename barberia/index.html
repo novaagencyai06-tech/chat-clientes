@@ -124,13 +124,16 @@ async function enviar() {
     + "&negocio=barberia_demo";
 
   const res = await fetch(url);
-  const data = await res.text();
+  const data = await res.json(); // 🔥 CAMBIO CLAVE
 
   typing.remove();
 
   const botMsg = document.createElement("div");
   botMsg.className = "bot";
-  botMsg.innerText = data;
+
+  // 🔥 MOSTRAR SOLO TEXTO LIMPIO
+  botMsg.innerText = data.mensaje || data.respuesta || JSON.stringify(data);
+
   chat.appendChild(botMsg);
 
   chat.scrollTop = chat.scrollHeight;
