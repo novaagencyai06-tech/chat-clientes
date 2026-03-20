@@ -22,8 +22,8 @@
       background: #075e54;
       color: white;
       padding: 15px;
-      font-weight: bold;
       text-align: center;
+      font-weight: bold;
     }
 
     #chat {
@@ -54,8 +54,8 @@
 
     #input-area {
       display: flex;
-      background: #f0f0f0;
       padding: 10px;
+      background: #f0f0f0;
     }
 
     input {
@@ -68,11 +68,12 @@
 
     button {
       margin-left: 10px;
-      padding: 10px 15px;
+      padding: 10px;
       border: none;
       background: #075e54;
       color: white;
       border-radius: 20px;
+      cursor: pointer;
     }
   </style>
 </head>
@@ -81,9 +82,7 @@
 
 <div id="chat-container">
 
-  <div id="header">
-    Reservas online
-  </div>
+  <div id="header">Reservas online</div>
 
   <div id="chat"></div>
 
@@ -96,22 +95,22 @@
 
 <script>
 async function enviar() {
-  const mensajeInput = document.getElementById("mensaje");
-  const mensaje = mensajeInput.value;
+  const input = document.getElementById("mensaje");
+  const texto = input.value;
 
-  if (!mensaje) return;
+  if (!texto) return;
 
   const chat = document.getElementById("chat");
 
   // mensaje usuario
-  const userMsg = document.createElement("div");
-  userMsg.className = "user";
-  userMsg.innerText = mensaje;
-  chat.appendChild(userMsg);
+  const user = document.createElement("div");
+  user.className = "user";
+  user.innerText = texto;
+  chat.appendChild(user);
 
-  mensajeInput.value = "";
+  input.value = "";
 
-  // escribiendo...
+  // escribiendo
   const typing = document.createElement("div");
   typing.className = "bot";
   typing.innerText = "Escribiendo...";
@@ -119,24 +118,41 @@ async function enviar() {
 
   chat.scrollTop = chat.scrollHeight;
 
-  const url = "https://nova-agency06.app.n8n.cloud/webhook/chat?message=" 
-    + encodeURIComponent(mensaje) 
-    + "&negocio=barberia_demo";
+  try {
+    const url = "https://nova-agency06.app.n8n.cloud/webhook/chat?message=" 
+      + encodeURIComponent(texto) 
+      + "&negocio=barberia_demo";
 
-  const res = await fetch(url);
-  const data = await res.json(); // 🔥 CAMBIO CLAVE
+    const res = await fetch(url);
 
-  typing.remove();
+    let data;
 
-  const botMsg = document.createElement("div");
-  botMsg.className = "bot";
+    // intentar como JSON
+    try {
+      const json = await res.json();
+      data = json.respuesta || json.mensaje || JSON.stringify(json);
+    } catch {
+      // si no es JSON, leer como texto
+      data = await res.text();
+    }
 
-  // 🔥 MOSTRAR SOLO TEXTO LIMPIO
-  botMsg.innerText = data.mensaje || data.respuesta || JSON.stringify(data);
+    typing.remove();
 
-  chat.appendChild(botMsg);
+    const bot = document.createElement("div");
+    bot.className = "bot";
+    bot.innerText = data;
+    chat.appendChild(bot);
 
-  chat.scrollTop = chat.scrollHeight;
+    chat.scrollTop = chat.scrollHeight;
+
+  } catch (error) {
+    typing.remove();
+
+    const bot = document.createElement("div");
+    bot.className = "bot";
+    bot.innerText = "Error al conectar 😅";
+    chat.appendChild(bot);
+  }
 }
 </script>
 
