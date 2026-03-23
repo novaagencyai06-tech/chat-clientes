@@ -15,7 +15,6 @@
       display: flex;
       flex-direction: column;
       height: 100vh;
-      width: 100%;
     }
 
     #header {
@@ -63,17 +62,15 @@
       padding: 10px;
       border-radius: 20px;
       border: none;
-      outline: none;
     }
 
     button {
       margin-left: 10px;
-      padding: 10px;
+      padding: 10px 15px;
       border: none;
       background: #075e54;
       color: white;
       border-radius: 20px;
-      cursor: pointer;
     }
   </style>
 </head>
@@ -81,23 +78,19 @@
 <body>
 
 <div id="chat-container">
-
   <div id="header">Reservas online</div>
-
   <div id="chat"></div>
 
   <div id="input-area">
     <input id="mensaje" placeholder="Escribe tu mensaje...">
     <button onclick="enviar()">Enviar</button>
   </div>
-
 </div>
 
 <script>
 async function enviar() {
   const input = document.getElementById("mensaje");
   const texto = input.value;
-
   if (!texto) return;
 
   const chat = document.getElementById("chat");
@@ -119,22 +112,13 @@ async function enviar() {
   chat.scrollTop = chat.scrollHeight;
 
   try {
-    const url = "https://nova-agency06.app.n8n.cloud/webhook/chat"
+    const res = await fetch(
+      "https://nova-agency06.app.n8n.cloud/webhook/chat?message=" 
       + encodeURIComponent(texto) 
-      + "&negocio=barberia_demo";
+      + "&negocio=barberia_demo"
+    );
 
-    const res = await fetch(url);
-
-    let data;
-
-    // intentar como JSON
-    try {
-      const json = await res.json();
-      data = json.respuesta || json.mensaje || JSON.stringify(json);
-    } catch {
-      // si no es JSON, leer como texto
-      data = await res.text();
-    }
+    const data = await res.text();
 
     typing.remove();
 
@@ -143,16 +127,11 @@ async function enviar() {
     bot.innerText = data;
     chat.appendChild(bot);
 
-    chat.scrollTop = chat.scrollHeight;
-
-  } catch (error) {
-    typing.remove();
-
-    const bot = document.createElement("div");
-    bot.className = "bot";
-    bot.innerText = "Error al conectar 😅";
-    chat.appendChild(bot);
+  } catch (e) {
+    typing.innerText = "Error al conectar 😅";
   }
+
+  chat.scrollTop = chat.scrollHeight;
 }
 </script>
 
